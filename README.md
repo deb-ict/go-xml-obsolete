@@ -1,6 +1,11 @@
 # go-xml
 This package is a copy of the encoding/xml package with namespace prefix support.
 
+# Installation
+`go get -u github.com/deb-ict/go-xml`
+
+Replace import `"encoding/xml"` with `"github.com/deb-ict/go-xml"`
+
 # Example
 This example show encoding & decoding of a SOAP envelope with namespace prefix support
 ```
