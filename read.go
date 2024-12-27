@@ -398,7 +398,18 @@ func (d *Decoder) unmarshal(val reflect.Value, start *StartElement, depth int) e
 		// TODO: For now, simply ignore the field. In the near
 		//       future we may choose to unmarshal the start
 		//       element on it, if not nil.
-		return d.Skip()
+		constructor, found := d.TypeConstructors[start.Name]
+		if found {
+			iv := reflect.ValueOf(constructor(d))
+			err := d.unmarshal(iv, start, depth+1)
+			if err != nil {
+				return err
+			}
+			v.Set(iv)
+			return nil
+		} else {
+			return d.Skip()
+		}
 
 	case reflect.Slice:
 		typ := v.Type()
