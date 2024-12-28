@@ -23,6 +23,8 @@ const (
 	Header = `<?xml version="1.0" encoding="UTF-8"?>` + "\n"
 )
 
+type Nametable map[string]string
+
 // Marshal returns the XML encoding of v.
 //
 // Marshal handles an array or slice by marshaling each of the elements.
@@ -78,11 +80,11 @@ const (
 //
 // Marshal will return an error if asked to marshal a channel, function, or map.
 func Marshal(v any) ([]byte, error) {
-	nametable := make(map[string]string)
+	nametable := make(Nametable)
 	return MarshalWithNametable(v, nametable)
 }
 
-func MarshalWithNametable(v any, nametable map[string]string) ([]byte, error) {
+func MarshalWithNametable(v any, nametable Nametable) ([]byte, error) {
 	var b bytes.Buffer
 	enc := NewEncoder(&b)
 	enc.p.nametable = nametable
@@ -134,11 +136,11 @@ type MarshalerAttr interface {
 // indented line that starts with prefix and is followed by one or more
 // copies of indent according to the nesting depth.
 func MarshalIndent(v any, prefix, indent string) ([]byte, error) {
-	nametable := make(map[string]string)
+	nametable := make(Nametable)
 	return MarshalIndentWithNametable(v, nametable, prefix, indent)
 }
 
-func MarshalIndentWithNametable(v any, nametable map[string]string, prefix, indent string) ([]byte, error) {
+func MarshalIndentWithNametable(v any, nametable Nametable, prefix, indent string) ([]byte, error) {
 	var b bytes.Buffer
 	enc := NewEncoder(&b)
 	enc.Indent(prefix, indent)
@@ -276,12 +278,12 @@ func (enc *Encoder) EncodeToken(t Token) error {
 
 func (enc *Encoder) SetNamespace(prefix, url string) {
 	if enc.p.nametable == nil {
-		enc.p.nametable = make(map[string]string)
+		enc.p.nametable = make(Nametable)
 	}
 	enc.p.nametable[url] = prefix
 }
 
-func (enc *Encoder) SetNametable(nametable map[string]string) {
+func (enc *Encoder) SetNametable(nametable Nametable) {
 	enc.p.nametable = nametable
 }
 
@@ -351,9 +353,9 @@ type printer struct {
 	tags          []Name
 	closed        bool
 	err           error
-	elementNS     map[string]string // map prefix -> name space
-	elementPrefix map[string]string // map name space -> prefix
-	nametable     map[string]string
+	elementNS     Nametable // map prefix -> name space
+	elementPrefix Nametable // map name space -> prefix
+	nametable     Nametable
 }
 
 func (p *printer) createElementPrefix(url string) (string, bool) {
@@ -374,8 +376,8 @@ func (p *printer) createElementPrefix(url string) (string, bool) {
 
 	// Need to define a new name space.
 	if p.elementPrefix == nil {
-		p.elementPrefix = make(map[string]string)
-		p.elementNS = make(map[string]string)
+		p.elementPrefix = make(Nametable)
+		p.elementNS = make(Nametable)
 	}
 
 	// Get the prefix from the nametable

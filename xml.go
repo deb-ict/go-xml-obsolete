@@ -127,6 +127,7 @@ func CopyToken(t Token) Token {
 }
 
 type TypeConstructor func(d *Decoder) any
+type TypeConstructorMap map[Name]TypeConstructor
 
 // A TokenReader is anything that can decode a stream of XML tokens, including a
 // [Decoder].
@@ -199,7 +200,7 @@ type Decoder struct {
 	// the attribute xmlns="DefaultSpace".
 	DefaultSpace string
 
-	TypeConstructors map[Name]TypeConstructor
+	TypeConstructors TypeConstructorMap
 
 	r              io.ByteReader
 	t              TokenReader
@@ -252,7 +253,7 @@ func NewTokenDecoder(t TokenReader) *Decoder {
 func (d *Decoder) RegisterType(space string, local string, constructor TypeConstructor) {
 	name := Name{Space: space, Local: local}
 	if d.TypeConstructors == nil {
-		d.TypeConstructors = make(map[Name]TypeConstructor)
+		d.TypeConstructors = make(TypeConstructorMap)
 	}
 	d.TypeConstructors[name] = constructor
 }
