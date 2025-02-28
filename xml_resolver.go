@@ -15,7 +15,8 @@ type XmlTypeConstructor func(resolver XmlResolver) (XmlNode, error)
 type XmlResolver interface {
 	GetDocument() *etree.Document
 	SetNamespacePrefix(prefix string, uri string)
-	GetElementSpace(uri string) string
+	GetNamespacePrefix(uri string) string
+	GetNamespaceUri(prefix string) string
 	RegisterTypeConstructor(uri string, tag string, ctor XmlTypeConstructor)
 	GetTypeConstructor(uri string, tag string) (XmlTypeConstructor, error)
 }
@@ -51,12 +52,20 @@ func (resolver *xmlResolver) SetNamespacePrefix(prefix string, uri string) {
 	resolver.uris[prefix] = uri
 }
 
-func (resolver *xmlResolver) GetElementSpace(uri string) string {
+func (resolver *xmlResolver) GetNamespacePrefix(uri string) string {
 	prefix, found := resolver.prefixes[uri]
 	if !found {
 		return uri
 	}
 	return prefix
+}
+
+func (resolver *xmlResolver) GetNamespaceUri(prefix string) string {
+	namespaceUri, found := resolver.uris[prefix]
+	if !found {
+		return prefix
+	}
+	return namespaceUri
 }
 
 func (resolver *xmlResolver) RegisterTypeConstructor(uri string, tag string, ctor XmlTypeConstructor) {
