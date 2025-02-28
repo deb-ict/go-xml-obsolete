@@ -23,7 +23,7 @@ func ValidateElement(el *etree.Element, tag string, namespaceUri string) error {
 	return nil
 }
 
-func getSingleChildElement(el *etree.Element, tag string, namespaceUri string) (*etree.Element, error) {
+func GetSingleChildElement(el *etree.Element, tag string, namespaceUri string) (*etree.Element, error) {
 	elements := el.SelectElements(tag)
 	if len(elements) == 0 {
 		return nil, ErrChildElementNotFound
@@ -34,7 +34,7 @@ func getSingleChildElement(el *etree.Element, tag string, namespaceUri string) (
 	return elements[0], nil
 }
 
-func getOptionalSingleChildElement(el *etree.Element, tag string, namespaceUri string) (*etree.Element, error) {
+func GetOptionalSingleChildElement(el *etree.Element, tag string, namespaceUri string) (*etree.Element, error) {
 	elements := el.SelectElements(tag)
 	if len(elements) > 1 {
 		return nil, ErrMultipleChildElementsFound
